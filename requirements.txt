@@ -1,0 +1,7 @@
+mcp
+openai>=1.75.0
+python-dotenv>=1.0.0
+asyncio
+aiohttp
+python-dotenv
+fastmcp==2.10.1
