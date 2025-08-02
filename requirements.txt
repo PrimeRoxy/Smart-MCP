@@ -5,3 +5,4 @@ asyncio
 aiohttp
 python-dotenv
 fastmcp==2.10.1
+streamlit

@@ -4,7 +4,6 @@ from mcp.server.fastmcp import FastMCP
 from openai import OpenAI
 import os
 from dotenv import load_dotenv
-import requests
 import json
 
 # Load environment variables from .env file
@@ -22,8 +21,29 @@ client = OpenAI(api_key=OPENAI_API_KEY)
 
 # Web search tool using GPT-4o search preview
 @mcp.tool()
-def perform_search(user_query: str) -> str:
-    """Perform real-time web search using OpenAI GPT-4o with web browsing"""
+def insight_scope(user_query: str) -> str:
+    """
+    InsightScope: An intelligent real-time web analysis agent.
+
+    This tool performs dynamic, real-time web research powered by GPT-4o with browsing capabilities.
+    It extracts and summarizes the most relevant, up-to-date information from trusted sources,
+    including news, websites, documentation, and user reviews.
+
+    Key Features:
+    - Context-aware web search tailored to the user's query.
+    - Real-time data extraction from authoritative sites.
+    - Summarized insights with clickable source links.
+    - Useful for market research, trend analysis, product scouting, or verifying recent developments.
+
+    Input:
+    - user_query (str): A natural-language query or topic of interest.
+
+    Output:
+    - A concise, informative summary with real-time findings and embedded links.
+
+    Example Use Case:
+    insight_scope("Latest updates on Apple's Vision Pro release")
+    """
     response = client.chat.completions.create(
         model="gpt-4o-search-preview",
         web_search_options={"search_context_size": "low"},
@@ -40,100 +60,73 @@ def perform_search(user_query: str) -> str:
     )
     return response.choices[0].message.content.strip()
 
-# Example static tool for testing
-@mcp.tool()
-def add(a: int, b: int) -> int:
-    """Add two numbers"""
-    return a + b
 
 @mcp.tool()
-def generate_search_queries(flattened_message: str):
+def perform_general_query(user_query: str) -> str:
+    """Perform a general query using a faster model."""
+    client = OpenAI() # Assuming client is initialized elsewhere
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",  # Changed to a faster, general-purpose model
+        messages=[
+            {
+                "role": "system",
+                "content": "You are a helpful assistant. Provide a concise and accurate answer to the user's query."
+            },
+            {
+                "role": "user",
+                "content": user_query
+            }
+        ],
+    )
+    return response.choices[0].message.content.strip()
+
+
+@mcp.tool()
+def generate_summary(long_text: str):
     """
-    Accepts a flattened message that contains the full system prompt, conversation context, and user's question.
-    Uses OpenAI to extract a clean search query and generate a semantic search query.
+    Summarizes long paragraphs or content from a text file in a professional, engaging manner,
+    preserving the original context and key information.
     """
-    # Step 1: Ask OpenAI to extract final query and summarize the conversation
-    extraction_prompt = [
+    # Step 1: Define the summarization prompt
+    summary_prompt = [
         {
             "role": "system",
             "content": (
-                "You are a backend assistant that receives a single message containing instructions, "
-                "conversation history, and the user's final question. Extract clean components needed for vector search."
+                "You are a professional summarization agent. Your job is to read large blocks of text "
+                "and generate concise, clear, and engaging summaries. Preserve all key ideas and context, "
+                "but remove redundancy or filler content. The summary should feel natural and insightful to the reader."
             )
         },
         {
             "role": "user",
             "content": (
-                f"Here is the message:\n{flattened_message}\n\n"
-                "1. Extract only the user's final question (no labeling).\n"
-                "2. Extract a very short summary (1–3 lines) of the conversation context relevant to the question.\n\n"
-                "Respond in text format with keys: 'query' and 'summary'."
+                f"Summarize the following content:\n\n{long_text}\n\n"
+                "Instructions:\n"
+                "1. Keep the tone professional and engaging.\n"
+                "2. Highlight important points or arguments.\n"
+                "3. Avoid unnecessary repetition or verbose phrases.\n"
+                "4. Maintain the integrity of the original message.\n"
+                "Output the result as a plain text summary (no headings or labels)."
             )
         }
     ]
 
-    extraction_response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=extraction_prompt,
-        temperature=0.2,
-        max_tokens=250
-    )
-    print("[DEBUG] Extraction Response from LLM:", extraction_response.choices[0].message.content)
     try:
-        parsed = json.loads(extraction_response.choices[0].message.content)
-        user_query = parsed.get("query", "").strip()
-        summary = parsed.get("summary", "").strip()
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=summary_prompt,
+            temperature=0.3,
+            max_tokens=600  # You can increase this if needed
+        )
+
+        summary_output = response.choices[0].message.content.strip()
+        print("[DEBUG] Generated Summary:\n", summary_output)
+        return summary_output
+
     except Exception as e:
-        print("[ERROR] Failed to parse JSON from LLM response:", e)
-        return []
+        print("[ERROR] Failed to generate summary:", e)
+        return "Summary generation failed. Please try again."
 
-    print("[DEBUG] Extracted Query:", user_query)
-    print("[DEBUG] Extracted Summary:", summary)
-
-    # Step 2: Generate semantic search queries from the clean query and summary
-    query_gen_prompt = [
-        {
-            "role": "system",
-            "content": (
-                "You are an AI assistant that generates short, high-quality search queries. "
-                "Always ensure the generated search query preserves the main context and intent of the user's original question. "
-                "Use the conversation summary only if it helps clarify the user's intent, but do not let it override or dilute the user's main question."
-            )
-        },
-        {
-            "role": "user",
-            "content": (
-                f"Conversation Summary:\n{summary}\n\n"
-                f"User Query:\n{user_query}\n\n"
-                "Generate 1 precise search query that matches the user's main question and preserves its core context."
-            )
-        }
-    ]
-
-    response_queries = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=query_gen_prompt,
-        temperature=0.2,
-        max_tokens=150
-    )
-
-    proposed_queries_text = response_queries.choices[0].message.content
-    print("[DEBUG] Proposed Search Queries from LLM:\n", proposed_queries_text)
-
-    # Step 3: Parse search queries from LLM output
-    queries = []
-    for line in proposed_queries_text.splitlines():
-        line = line.strip("-•*\"•.\t ").strip()
-        if line:
-            queries.append(line)
-
-    if not queries and proposed_queries_text:
-        queries = [q.strip() for q in proposed_queries_text.split(".") if q.strip()]
-
-    queries = queries[:4]
-    print("[DEBUG] Final Parsed Queries:", queries)
-
-    return queries
 
 
 # Run the server for local development or testing

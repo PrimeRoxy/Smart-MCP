@@ -14,7 +14,7 @@ Smart MCP: AI-powered client for Model Context Protocol with natural language pr
 📚 **RAG Integration** - Retrieval-Augmented Generation (Coming Soon)  
 ⚡ **High Performance** - Async architecture with real-time communication  
 🛠️ **Extensible Tools** - Easy plugin system for custom capabilities  
-🎯 **Smart Query Parsing** - Natural language queries automatically mapped to appropriate tools and resources  
+🎯 **Smart Summarizes** - Summarizes long paragraphs or content from a text file in a professional, engaging manner,preserving the original context and key information.
 🔧 **Dynamic Tool Discovery** - Auto-detection and listing of available MCP tools  
 📦 **Resource Management** - Easy access to MCP resources with intelligent parameter extraction  
 🤖 **OpenAI Integration** - Leverages GPT-4 for intelligent query interpretation  
