@@ -46,7 +46,7 @@ header {visibility: hidden;}
 
 /* Sidebar styling */
 .css-1d391kg, .css-6qob1r, .css-18e3th9, .stSidebar > div { 
-    background: #1a1d29 !important;
+    background: #9109e0e3 !important;
     border-right: 1px solid #3a4553 !important;
 }
 

@@ -3,6 +3,7 @@ from mcp.server.fastmcp import FastMCP
 from openai import OpenAI
 import os
 from dotenv import load_dotenv
+from service.reasoning import reasoning_agent
 from service.places import chat_with_places_assistant
 from service.services import generate_summary, perform_general_query, realtime_web_search
 
@@ -22,7 +23,7 @@ client = OpenAI(api_key=OPENAI_API_KEY)
 
 
 @mcp.tool()
-def insight_scope(user_query: str) -> str:
+def Insight_scope(user_query: str) -> str:
     """
     InsightScope: An intelligent real-time web analysis agent.
 
@@ -50,7 +51,7 @@ def insight_scope(user_query: str) -> str:
 
 
 @mcp.tool()
-def quickclarity(user_query: str) -> str:
+def Quickclarity(user_query: str) -> str:
     """
     QuickClarity: A fast, general-purpose assistant for instant answers.
 
@@ -76,7 +77,7 @@ def quickclarity(user_query: str) -> str:
 
 
 @mcp.tool()
-def corebrief(long_text: str):
+def Corebrief(long_text: str):
     """
     CoreBrief: A professional-grade summarization agent.
 
@@ -102,7 +103,7 @@ def corebrief(long_text: str):
     return generate_summary(long_text)
 
 @mcp.add_tool
-def geo_whisper(user_query: str) -> str:
+def Geo_whisper(user_query: str) -> str:
     """
     GeoWhisper: A conversational location intelligence agent.
 
@@ -124,6 +125,60 @@ def geo_whisper(user_query: str) -> str:
     geo_whisper("Vegan restaurants near Juhu Beach")
     """
     return chat_with_places_assistant(user_query,client)
+
+@mcp.add_tool
+async def Reasoning_agent(user_query: str) -> str:
+    """
+    Reasoning Agent: An advanced, context-aware reasoning and research assistant.
+
+    This tool is designed to handle complex, open-ended, or multifaceted queries by combining
+    multiple research and reasoning strategies into a single coherent response. It can perform
+    real-time web searches, query specialized knowledge bases, retrieve domain-specific documents,
+    and synthesize findings into a structured, well-supported answer.
+
+    Capabilities:
+    - Multi-source research via web search, retrieval-augmented generation (RAG), and curated datasets
+    - Intelligent information synthesis that merges factual data, expert analysis, and context-specific insights
+    - Context adaptation to tailor responses based on query scope, intent, and complexity
+    - Support for comparative analysis, historical trends, and multi-perspective evaluation
+    - Fact-checking and credibility assessment from diverse, reliable sources
+
+    Ideal For:
+    - In-depth research tasks and exploratory analysis
+    - Investigating emerging trends, technical developments, or policy shifts
+    - Fact verification and cross-referencing information from multiple viewpoints
+    - Strategic decision support where clarity, accuracy, and context are critical
+
+    Input:
+    - user_query (str): A specific or open-ended question/topic requiring thorough investigation.
+
+    Output:
+    - A well-rounded, evidence-backed response synthesizing insights from multiple data streams,
+      including a clearly stated final answer and, if applicable, a supporting research summary.
+
+    Example:
+    reasoning_agent("What are the most promising applications of quantum computing in cybersecurity?")
+    """
+    response = await reasoning_agent.process_request(query=user_query)
+    print("[DEBUG] Reasoning Agent Response:", response)
+
+    if not response or "result" not in response:
+        return "No answer found."
+
+    result = response["result"]
+
+    final_answer = result.get("final_answer", "")
+    research_summary = result.get("content", "")
+
+    if research_summary and final_answer:
+        return f"RESEARCH SUMMARY:\n{research_summary}\n\nFINAL ANSWER:\n{final_answer}"
+    elif final_answer:
+        return f"FINAL ANSWER:\n{final_answer}"
+    elif research_summary:
+        return f"RESEARCH SUMMARY:\n{research_summary}"
+    else:
+        return "No detailed answer available."
+
 
 
 # Run the server for local development or testing
