@@ -28,22 +28,57 @@ st.markdown("""
     font-family: 'Inter', sans-serif;
 }
 
+/* Force sidebar to be visible */
+.css-1lcbmhc, .css-1outpf7, .css-1y4p8pa, .css-12oz5g7 {
+    background: #1a1d29 !important;
+}
+
+/* Ensure sidebar is always shown */
+.stSidebar {
+    display: block !important;
+    visibility: visible !important; 
+}
+
 /* Hide streamlit elements */
 #MainMenu {visibility: hidden;}
 footer {visibility: hidden;}
 header {visibility: hidden;}
 
 /* Sidebar styling */
-.css-1d391kg { 
-    background: #1a1d29;
-    border-right: 1px solid #3a4553;
+.css-1d391kg, .css-6qob1r, .css-18e3th9, .stSidebar > div { 
+    background: #1a1d29 !important;
+    border-right: 1px solid #3a4553 !important;
+}
+
+.stSidebar {
+    background: #1a1d29 !important;
+}
+
+.stSidebar .stMarkdown {
+    color: #e1e5e9 !important;
 }
 
 /* Main container */
 .main .block-container { 
-    max-width: none;
-    padding: 0;
-    margin: 0;
+    max-width: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* Main content area - adjust for sidebar */
+.main {
+    background: #1e2329 !important;
+}
+
+/* Chat header positioning */
+.chat-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid #3a4553;
+    background: #1a1d29;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 !important;
 }
 
 /* Chat container */
@@ -86,10 +121,12 @@ header {visibility: hidden;}
 
 /* Messages area */
 .messages-container {
-    flex: 1;
+    min-height: 50vh;
+    max-height: calc(100vh - 250px);
     padding: 20px;
     overflow-y: auto;
     background: #1e2329;
+    margin-bottom: 100px;
 }
 
 /* Message styling */
@@ -184,11 +221,20 @@ header {visibility: hidden;}
 .input-container {
     position: fixed;
     bottom: 0;
-    left: 252px;
+    left: 0;
     right: 0;
     background: #1e2329;
     border-top: 1px solid #3a4553;
     padding: 20px;
+    z-index: 1000;
+}
+
+.input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: calc(100vw - 300px);
+    margin-left: 252px;
 }
 
 .input-wrapper {
@@ -313,19 +359,12 @@ header {visibility: hidden;}
 </style>
 """, unsafe_allow_html=True)
 
-# Custom HTML structure for the chat interface
+# Custom HTML structure for the chat interface header only
 st.markdown("""
-<div class="chat-container">
-    <div class="chat-main">
-        <div class="chat-header">
-            <div>
-                <div class="chat-title">Smart-MCP Chat Interface</div>
-                <div class="chat-subtitle">Powered by advanced AI reasoning</div>
-            </div>
-        </div>
-        <div class="messages-container" id="messages-container">
-            <!-- Messages will be populated here -->
-        </div>
+<div class="chat-header">
+    <div>
+        <div class="chat-title">Smart-MCP Chat Interface</div>
+        <div class="chat-subtitle">Powered by advanced AI reasoning</div>
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -652,8 +691,10 @@ async def handle_query_and_response(user_input, status_container):
 
             return (None, f"Unknown type: {typ}")
 
-# Display chat history
+# Display chat history in proper messages container
+st.markdown('<div class="messages-container" id="messages-container">', unsafe_allow_html=True)
 render_messages()
+st.markdown('</div>', unsafe_allow_html=True)
 
 # Input area
 st.markdown("""
