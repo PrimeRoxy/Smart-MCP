@@ -23,14 +23,18 @@ st.markdown("""
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 /* Global styling */
-.stApp { 
-    background: #1e2329;
-    font-family: 'Inter', sans-serif;
+.stApp {
+    background: 
+        radial-gradient(circle at 20% 20%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+        linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+    background-size: 100% 100%, 100% 100%, 300% 300%;
+    animation: modernGradient 20s ease infinite;
 }
 
 /* Force sidebar to be visible */
 .css-1lcbmhc, .css-1outpf7, .css-1y4p8pa, .css-12oz5g7 {
-    background: #1a1d29 !important;
+    background: #46e7e4e4 !important;
 }
 
 /* Ensure sidebar is always shown */
@@ -46,8 +50,8 @@ header {visibility: hidden;}
 
 /* Sidebar styling */
 .css-1d391kg, .css-6qob1r, .css-18e3th9, .stSidebar > div { 
-    background: #9109e0e3 !important;
-    border-right: 1px solid #3a4553 !important;
+    background: #d55eedfe !important;
+    border-right: 1px solid #ed460a8a !important;
 }
 
 .stSidebar {
@@ -70,16 +74,6 @@ header {visibility: hidden;}
     background: #1e2329 !important;
 }
 
-/* Chat header positioning */
-.chat-header {
-    padding: 16px 24px;
-    border-bottom: 1px solid #3a4553;
-    background: #1a1d29;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin: 0 !important;
-}
 
 /* Chat container */
 .chat-container {
@@ -96,38 +90,43 @@ header {visibility: hidden;}
     position: relative;
 }
 
-/* Header */
+            
 .chat-header {
+    background: rgba(26, 29, 41, 0.98);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     padding: 16px 24px;
-    border-bottom: 1px solid #3a4553;
-    background: #1a1d29;
+    margin: 0 !important;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 16px;
+    backdrop-filter: blur(20px);
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    width: 100%;
+    box-sizing: border-box;
+}
+            
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(76, 175, 80, 0.1);
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(76, 175, 80, 0.3);
 }
 
 .chat-title {
-    color: #e1e5e9;
-    font-size: 18px;
-    font-weight: 600;
+    color: #ffffff;
+    font-size: 24px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #ffffff 0%, #64b5f6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
     margin: 0;
 }
 
-.chat-subtitle {
-    color: #8b949e;
-    font-size: 14px;
-    margin: 0;
-}
-
-/* Messages area */
-.messages-container {
-    min-height: 50vh;
-    max-height: calc(100vh - 250px);
-    padding: 20px;
-    overflow-y: auto;
-    background: #1e2329;
-    margin-bottom: 100px;
-}
 
 /* Message styling */
 .message {
@@ -217,17 +216,6 @@ header {visibility: hidden;}
     opacity: 1;
 }
 
-/* Input area */
-.input-container {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: #1e2329;
-    border-top: 1px solid #3a4553;
-    padding: 20px;
-    z-index: 1000;
-}
 
 .input-wrapper {
     display: flex;
@@ -362,9 +350,12 @@ header {visibility: hidden;}
 # Custom HTML structure for the chat interface header only
 st.markdown("""
 <div class="chat-header">
-    <div>
-        <div class="chat-title">Smart-MCP Chat Interface</div>
-        <div class="chat-subtitle">Powered by advanced AI reasoning</div>
+    <div style="display: flex; align-items: center; gap: 16px;">
+        <div class="chat-title">Smart-MCP Chat</div>
+        <div class="status-indicator">
+            <div style="width: 8px; height: 8px; background: #4caf50; border-radius: 50%;"></div>
+            <span style="color: #4caf50; font-size: 12px;">AI Ready</span>
+        </div>
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -696,11 +687,7 @@ st.markdown('<div class="messages-container" id="messages-container">', unsafe_a
 render_messages()
 st.markdown('</div>', unsafe_allow_html=True)
 
-# Input area
-st.markdown("""
-<div class="input-container">
-    <div class="input-wrapper">
-""", unsafe_allow_html=True)
+
 
 # Create columns for input and button
 col1, col2 = st.columns([10, 1])
@@ -741,12 +728,17 @@ if send_clicked and user_input.strip():
     st.session_state["clear_input"] = True
     st.rerun()
 
-# Auto-scroll to bottom
+
 st.markdown("""
 <script>
-const container = document.getElementById('messages-container');
-if (container) {
-    container.scrollTop = container.scrollHeight;
+function autoScroll() {
+    const main = document.querySelector('.main');
+    if (main) {
+        main.scrollTop = main.scrollHeight;
+    }
+    window.scrollTo(0, document.body.scrollHeight);
 }
+setTimeout(autoScroll, 100);
+setTimeout(autoScroll, 500);
 </script>
 """, unsafe_allow_html=True)
