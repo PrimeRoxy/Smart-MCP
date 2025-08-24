@@ -6,7 +6,8 @@ from dotenv import load_dotenv
 from service.reasoning import reasoning_agent
 from service.places import chat_with_places_assistant
 from service.services import generate_summary, perform_general_query, realtime_web_search
-
+from service.gmail import format_search_results, gmail_draft_tool, gmail_get_tool, gmail_search_tool, gmail_send_tool
+from langchain_google_community.gmail.search import Resource
 # Load environment variables from .env file
 load_dotenv()
 
@@ -178,6 +179,71 @@ async def Reasoning_agent(user_query: str) -> str:
         return f"RESEARCH SUMMARY:\n{research_summary}"
     else:
         return "No detailed answer available."
+
+
+@mcp.add_tool
+def gmail_send(to: str, subject: str, message: str, cc: str = None, bcc: str = None) -> dict:
+    """
+    Send an email using Gmail.
+
+    Args:
+        to (str): Recipient email address.
+        subject (str): Subject line.
+        message (str): Email body content.
+        cc (str, optional): CC recipients.
+        bcc (str, optional): BCC recipients.
+
+    Returns:
+        dict: Status + Gmail API response
+    """
+    payload = {
+        "to": [to],
+        "subject": subject,
+        "message": message,
+        "cc": [cc] if cc else None,
+        "bcc": [bcc] if bcc else None,
+    }
+    result = gmail_send_tool.invoke(payload)
+    return format_search_results(str(result))
+
+
+@mcp.add_tool
+def gmail_draft(to: str, subject: str, message: str, cc: str = None, bcc: str = None) -> dict:
+    """
+    Create a Gmail draft.
+    """
+    payload = {
+        "to": [to],
+        "subject": subject,
+        "message": message,
+        "cc": [cc] if cc else None,
+        "bcc": [bcc] if bcc else None,
+    }
+    result = gmail_draft_tool.invoke(payload)
+    return format_search_results(str(result))
+
+
+@mcp.add_tool
+def gmail_search(query: str, max_results: int = 10, resource: str = "messages") -> dict:
+    """
+    Search Gmail messages or threads.
+
+    Args:
+        query (str): Gmail search string.
+        max_results (int): Max results (default 10).
+        resource (str): 'messages' or 'threads'.
+
+    Returns:
+        dict: Search results with metadata.
+    """
+    payload = {
+        "query": query,
+        "max_results": max_results,
+        "resource": Resource.MESSAGES if resource == "messages" else Resource.THREADS
+    }
+    result = gmail_search_tool.invoke(payload)
+    return format_search_results(str(result))
+
 
 
 

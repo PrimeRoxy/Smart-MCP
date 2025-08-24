@@ -6,3 +6,9 @@ aiohttp
 python-dotenv
 fastmcp==2.10.1
 streamlit
+langchain-google-community
+langchain-community
+langchain
+google-auth-oauthlib
+google-auth
+google-api-python-client
