@@ -1,4 +1,5 @@
 # server.py
+from typing import List,Dict, Any
 from mcp.server.fastmcp import FastMCP
 from openai import OpenAI
 import os
@@ -8,6 +9,7 @@ from service.places import chat_with_places_assistant
 from service.services import generate_summary, perform_general_query, realtime_web_search
 from service.gmail import format_search_results, gmail_draft_tool, gmail_get_tool, gmail_search_tool, gmail_send_tool
 from langchain_google_community.gmail.search import Resource
+from service.schedular import scheduler
 # Load environment variables from .env file
 load_dotenv()
 
@@ -244,8 +246,34 @@ def gmail_search(query: str, max_results: int = 10, resource: str = "messages") 
     result = gmail_search_tool.invoke(payload)
     return format_search_results(str(result))
 
+@mcp.tool()
+def schedule_meeting(date: str, start_time: str, end_time: str, attendee_email: str) -> Dict[str, Any]:
+    """
+    Schedule a meeting in Google Calendar.
+
+    Input
+    - date (str): The date of the meeting (format: YYYY-MM-DD).
+    - start_time (str): The start time of the meeting (format: HH:MM).
+    - end_time (str): The end time of the meeting (format: HH:MM).
+    - attendee_email (str): The email address of the meeting attendee.
+
+    """
+    response = scheduler.schedule_meeting(date, start_time, end_time, attendee_email)
+    return response
 
 
+# @mcp.tool()
+# def finish_meeting(event_id: str) -> Dict[str, Any]:
+#     """Finish (delete) a scheduled meeting by event ID."""
+#     response = scheduler.finish_meeting(event_id)
+#     return response
+
+
+@mcp.tool()
+def list_meetings() -> List[Dict[str, Any]]:
+    """List the next 10 upcoming meetings."""
+    response = scheduler.list_meetings()
+    return response
 
 # Run the server for local development or testing
 if __name__ == "__main__":
