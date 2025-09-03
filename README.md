@@ -16,22 +16,22 @@
 ### **Streamlit Web Interface**
 Experience Smart MCP through our intuitive web interface with real-time tool execution and smart query analysis.
 
-![Smart MCP Interface - Tool Selection](https://github.com/user-attachments/assets/your-image-1)
+![Smart MCP Interface - Tool Selection](service/demo_image/web_interface.png)
 *Interactive web interface showing available tools and initial query processing*
 
-![Smart MCP - Query Processing](https://github.com/user-attachments/assets/your-image-2)
+![Smart MCP - Query Processing](service/demo_image/query_analysis.png)
 *Real-time query analysis with tool selection and parameter extraction*
 
-![GeoWhisper Location Intelligence](https://github.com/user-attachments/assets/your-image-3)
+![GeoWhisper Location Intelligence](service/demo_image/geowishper.png)
 *GeoWhisper tool providing location-based recommendations with detailed place information*
 
-![InsightScope Weather Intelligence](https://github.com/user-attachments/assets/your-image-4)
+![InsightScope Weather Intelligence](service/demo_image/real_time.png)
 *InsightScope delivering comprehensive weather analysis with real-time alerts and forecasts*
 
-![Gmail Integration Demo](https://github.com/user-attachments/assets/your-image-5)
+![Gmail Integration Demo](service/demo_image/email_automation.png)
 *Email automation showing query processing and successful message delivery*
 
-![Email Success Confirmation](https://github.com/user-attachments/assets/your-image-6)
+![Email Success Confirmation](service/demo_image/successful_email.png)
 *Confirmation of successful email operations with user-friendly feedback*
 
 ### **Command Line Interface**
