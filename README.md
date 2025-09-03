@@ -4,8 +4,7 @@
 ![Python](https://img.shields.io/badge/python-v3.12+-blue.svg)
 ![OpenAI](https://img.shields.io/badge/openai-v1.75+-green.svg)
 ![FastAPI](https://img.shields.io/badge/fastapi-0.100+-red.svg)
-![Status](https://img.shields.io/badge/status-production--ready-success.svg)
-![License](https://img.shields.io/badge/license-MIT-green.svg)
+
 
 > **Next-Generation AI Assistant Platform** - Seamlessly connect AI models with intelligent query parsing, real-time web search, location services, email automation, and advanced reasoning capabilities in one unified ecosystem.
 
